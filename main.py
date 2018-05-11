@@ -1,12 +1,13 @@
 def fill_L(rules):
-    '''Build dictionary of L(U)'''
+    '''Build dictionary for L(U)'''
     L = {}
 
     # step 1
     for key in rules:
         for elemInList in RULES[key]:
             if key in L:
-                L[key].append(elemInList[:1])
+                if elemInList[:1] not in L[key]:
+                 L[key].append(elemInList[:1])
             else:
                 L[key] = list(elemInList)[:1]
 
@@ -20,14 +21,15 @@ def fill_L(rules):
     return L
 
 def fill_R(rules):
-    '''Build dictionary of R(U)'''
+    '''Build dictionary for R(U)'''
     R = {}
 
     # step 1
     for key in rules:
         for elemInList in RULES[key]:
             if key in R:
-                R[key].append(elemInList[-1:])
+                if elemInList[-1:] not in R[key]:
+                    R[key].append(elemInList[-1:])
             else:
                 R[key] = list(elemInList)[-1:]
 
@@ -41,7 +43,9 @@ def fill_R(rules):
     return R
 
 def main():
+    L = fill_L(RULES)
     R = fill_R(RULES)
+    print (L)
     print (R)
 
 if __name__ == '__main__':
