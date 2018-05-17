@@ -131,21 +131,93 @@ def MOP():
     return mop
 
 def main():
-    L_t = fill_L_t()
-    R_t = fill_R_t()
-    print (L_t)
-    print (R_t)
+
+    stack = []
     mop = MOP()
-    print(mop)
+
+    # START
+    stack.append(STR[0])
+
+    pointerStr = 1
+    while pointerStr < len(STR):
+        elemInStr = STR[pointerStr]
+        elemForStack = ''
+
+        # check the STR and replace the identifier with 'I'
+        if elemInStr in TERM:
+            elemForStack = elemInStr
+        elif elemInStr in IDENT:
+            elemForStack = 'I'
+        else:
+            assert(print('ERROR in main(): incorrect input data!'))
+
+        # check whether the last character is a terminal in stack
+        pointerStack = stack.__len__() - 1
+        if stack[pointerStack] in NONTERM:
+            pointerStack -= 1
+            # check that the penultimate character in the stack is a terminal
+            if stack[pointerStack] not in TERM:
+                assert (print("ERROR in main(): the penultimate character in the stack isn't a terminal"))
+
+        # find the ratio of the precedence
+        if mop.get((stack[pointerStack], elemForStack)) == '<':
+            if pointerStack == (len(stack) - 1):
+                stack.append('<')
+                stack.append(elemForStack)
+            else:
+                tmp = stack.pop()
+                stack.append('<')
+                stack.append(tmp)
+                stack.append(elemForStack)
+        elif mop.get((stack[pointerStack], elemForStack)) == '>':
+            lastElemStack = stack.pop()
+            while lastElemStack[-1:] != '<':
+                lastElemStack += stack.pop()
+
+            lastElemStack = lastElemStack[:-1]
+            lastElemStack = lastElemStack[::-1]
+
+            # Among the generating rules, we seek a rule containing the primary phrase on the right-hand side of
+            for rules in RULES:
+                for rightRules in RULES[rules]:
+                    if rightRules == lastElemStack:
+                        lastElemStack = rules
+                        pointerStr -= 1
+                        break
+
+            stack.append(lastElemStack)
+        elif mop.get((stack[pointerStack], elemForStack)) == '=':
+            stack.append(elemForStack)
+        else:
+            assert(print('ERROR in main(): incorrect work algorithm'))
+
+        pointerStr += 1
+        print(stack)
+
+    # print result
+    result = ''
+    for ch in stack:
+        result += ch
+
+    for rules in RULES:
+        for rightRules in RULES[rules]:
+            if rightRules == result:
+                result = rules
+
+    if result == 'A':
+        print('EEE')
+    else:
+        print('No')
 
 if __name__ == '__main__':
 
     # initialization
 
-    RULES = {'A' : ['!B!'], 'B' : ['B+T', 'T'], 'T' : ['T*M', 'M'], 'M' : ['I', '(B)']}
+    RULES = {'A' : ['!B!', '!T!'], 'B' : ['B+T', 'T', 'M+M'], 'T' : ['T*M', 'M', 'M*M'], 'M' : ['I', '(B)']}
     # NUMBER_ALT = {'B': 2, 'T': 2, 'M': 2}
     TERM = {'!', '(', ')', '+', '*', 'I'}
     NONTERM = {'A', 'B', 'T', 'M'}
+    IDENT = {'a', 'b', 'c'}
     First_PLACE_in_RULES = {'A' : 1, 'B': 2, 'T': 4, 'M': 6}
 
     STR = '!(a+b)*c!'
