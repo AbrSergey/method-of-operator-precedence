@@ -132,6 +132,8 @@ def MOP():
 
 def main():
 
+    PARSING = ''
+    POLIZE = ''
     stack = []
     mop = MOP()
 
@@ -147,6 +149,8 @@ def main():
         if elemInStr in TERM:
             elemForStack = elemInStr
         elif elemInStr in IDENT:
+            POLIZE += elemInStr
+            PARSING += '4' # ???!!!
             elemForStack = 'I'
         else:
             assert(print('ERROR in main(): incorrect input data!'))
@@ -178,6 +182,29 @@ def main():
             lastElemStack = lastElemStack[::-1]
 
             # Among the generating rules, we seek a rule containing the primary phrase on the right-hand side of
+            strForRules = ''
+            for ch in lastElemStack:
+                if ch == 'I':
+                    strForRules += 'NONTERM'
+                elif ch in NONTERM:
+                    strForRules += 'NONTERM'
+                elif ch in TERM:
+                    strForRules += ch
+                else:
+                    assert(print("ERROR in main(): incorrect variable : lastElemStack"))
+
+            # for print rules
+            for rules in RULES_RESOLVER:
+                for rightRules in RULES_RESOLVER[rules]:
+                    if rightRules == strForRules:
+                        PARSING += str(First_PLACE_in_RULES_RESOLVER[rules])
+                        try:
+                            POLIZE += For_Polize[rules]
+                        except:
+                            pass
+                        break
+
+            # for next steps
             for rules in RULES:
                 for rightRules in RULES[rules]:
                     if rightRules == lastElemStack:
@@ -203,9 +230,11 @@ def main():
         for rightRules in RULES[rules]:
             if rightRules == result:
                 result = rules
+                PARSING += '1'
 
     if result == 'A':
-        print('EEE')
+        print(PARSING)
+        print(POLIZE)
     else:
         print('No')
 
@@ -213,13 +242,16 @@ if __name__ == '__main__':
 
     # initialization
 
-    RULES = {'A' : ['!B!', '!T!'], 'B' : ['B+T', 'T', 'M+M'], 'T' : ['T*M', 'M', 'M*M'], 'M' : ['I', '(B)']}
+    RULES = {'A' : ['!B!', '!T!'], 'B' : ['B+T', 'T', 'M+M', 'T+M', 'T+T'], 'T' : ['T*M', 'M', 'M*M'], 'M' : ['I', '(B)']}
+    # RULES = {'A': ['!B!'], 'B': ['B+T'], 'T': ['T*M'], 'M': ['I', '(B)']}
+    RULES_RESOLVER = {'A': ['!NONTERM!'], 'B': ['NONTERM+NONTERM'], 'T': ['NONTERM*NONTERM'], 'M': ['I', '(NONTERM)']}
     # NUMBER_ALT = {'B': 2, 'T': 2, 'M': 2}
     TERM = {'!', '(', ')', '+', '*', 'I'}
     NONTERM = {'A', 'B', 'T', 'M'}
     IDENT = {'a', 'b', 'c'}
-    First_PLACE_in_RULES = {'A' : 1, 'B': 2, 'T': 4, 'M': 6}
+    First_PLACE_in_RULES_RESOLVER = {'A' : 1, 'B': 2, 'T': 3, 'M': 5}
+    For_Polize = {'B': '+', 'T': '*'}
 
-    STR = '!(a+b)*c!'
+    STR = '!(a+b)*c+a*b+a*(c+a)*c!'
 
     main()
