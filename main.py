@@ -98,11 +98,45 @@ def fill_R_t():
                         R_t[key].append(i)
     return R_t
 
+def MOP():
+    '''Using the dictionaries, L_t and R_t, construct the operator precedence matrix - mop{}'''
+    mop = {}
+    L_t = fill_L_t()
+    R_t = fill_R_t()
+
+    # fill =
+    for leftInRules in RULES:
+        for right in RULES[leftInRules]:
+            if len(right) == 3 and right[0] in TERM and right[2] in TERM:
+                mop[(right[0]), (right[2])] = '='
+
+    # fill <
+    for leftInRules in RULES:
+        for right in RULES[leftInRules]:
+            if len(right) >= 2:
+                for i in range(len(right) - 1):
+                    if right[i] in TERM and right[i+1] in NONTERM:
+                        for elementInL_t in L_t[right[i+1]]:
+                            mop[right[i], elementInL_t] = '<'
+
+    # fill >
+    for leftInRules in RULES:
+        for right in RULES[leftInRules]:
+            if len(right) >= 2:
+                for i in range(len(right) - 1):
+                    if right[i] in NONTERM and right[i + 1] in TERM:
+                        for elementInR_t in R_t[right[i]]:
+                            mop[elementInR_t, right[i + 1]] = '>'
+
+    return mop
+
 def main():
     L_t = fill_L_t()
     R_t = fill_R_t()
     print (L_t)
     print (R_t)
+    mop = MOP()
+    print(mop)
 
 if __name__ == '__main__':
 
