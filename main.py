@@ -216,7 +216,8 @@ def main():
         elif mop.get((stack[pointerStack], elemForStack)) == '=':
             stack.append(elemForStack)
         else:
-            assert(print('ERROR in main(): incorrect work algorithm'))
+            print('This STR not in this grammatic!')
+            return
 
         pointerStr += 1
         print(stack)
@@ -236,22 +237,20 @@ def main():
         print(PARSING)
         print(POLIZE)
     else:
-        print('No')
+        print('Incorrect')
 
 if __name__ == '__main__':
 
     # initialization
 
     RULES = {'A' : ['!B!', '!T!'], 'B' : ['B+T', 'T', 'M+M', 'T+M', 'T+T'], 'T' : ['T*M', 'M', 'M*M'], 'M' : ['I', '(B)']}
-    # RULES = {'A': ['!B!'], 'B': ['B+T'], 'T': ['T*M'], 'M': ['I', '(B)']}
     RULES_RESOLVER = {'A': ['!NONTERM!'], 'B': ['NONTERM+NONTERM'], 'T': ['NONTERM*NONTERM'], 'M': ['I', '(NONTERM)']}
-    # NUMBER_ALT = {'B': 2, 'T': 2, 'M': 2}
     TERM = {'!', '(', ')', '+', '*', 'I'}
     NONTERM = {'A', 'B', 'T', 'M'}
     IDENT = {'a', 'b', 'c'}
     First_PLACE_in_RULES_RESOLVER = {'A' : 1, 'B': 2, 'T': 3, 'M': 5}
     For_Polize = {'B': '+', 'T': '*'}
 
-    STR = '!(a+b)*c+a*b+a*(c+a)*c!'
+    STR = '!(a+b)*c+a*b+a*c+a)*c!'
 
     main()
